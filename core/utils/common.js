@@ -95,6 +95,11 @@ common.createFileFromRequest = function (url, filePath) {
         })
         .on('response', function (response) {
           if (response.statusCode == 200) {
+            let folderPath = filePath.substr(0, filePath.lastIndexOf('/'))
+            if(!fs.existsSync(folderPath)){
+              // 创建目录
+              fs.mkdirSync(folderPath, {recursive: true})
+            }
             let stream = fs.createWriteStream(filePath);
             response.pipe(stream);
             stream.on('close',function(){

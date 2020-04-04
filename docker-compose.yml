@@ -1,0 +1,66 @@
+version: "3.6"
+services:
+  code-push:
+    build: .
+    container_name: code-push
+    environment:
+      NODE_ENV: "production"
+      DB_USERNAME: "codepush"
+      DB_PASSWORD: "123456"
+      DB_NAME: "codepush"
+      DB_HOST: "127.0.0.1"
+      DB_PORT: "3308"
+      DB_DIALECT: "mysql"
+      REDIS_HOST: "127.0.0.1"
+      REDIS_PORT: "6388"
+      STORAGE_TYPE: "oss"
+      OSS_ACCESS_KEY_ID: "REPLACE_YOUR_OSS_ACCESS_KEY_ID"
+      OSS_SECRET_ACCESS_KEY: "REPLACE_YOUR_OSS_SECRET_ACCESS_KEY"
+      OSS_END_POINT: "REPLACE_YOUR_OSS_END_POINT"
+      OSS_BUCKET_NAME: "REPLACE_YOUR_OSS_BUCKET_NAME"
+      OSS_PREFIX: ""
+      OSS_DOWNLOAD: "REPLACE_YOUR_OSS_DOWNLOAD"
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "3000:3000"
+    #networks:
+    #  - code-push-net
+    network_mode: host
+    volumes:
+      - data-code-push:/data
+    depends_on:
+      - db
+      - redis
+  db:
+    image: mysql:5.7.23
+    volumes:
+      - data-mysql:/var/lib/mysql
+      - ./sql/codepush-all.sql:/docker-entrypoint-initdb.d/codepush-all.sql
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "On"
+    networks:
+      - dbnet
+  redis:
+    image: redis:4.0.11-alpine
+    volumes:
+      - data-redis:/data
+    ports:
+      - "6388:6379"
+    networks:
+      - redisnet
+networks:
+  code-push-net:
+  redisnet:
+  dbnet:
+volumes:
+  data-mysql:
+  data-redis:
+  data-code-push:
+    

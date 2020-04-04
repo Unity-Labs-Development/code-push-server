@@ -4,12 +4,12 @@ var config = {};
 config.development = {
   // Config for database, only support mysql.
   db: {
-    username: process.env.RDS_USERNAME || "root",
-    password: process.env.RDS_PASSWORD || null,
-    database: process.env.DATA_BASE || "codepush",
-    host: process.env.RDS_HOST || "127.0.0.1",
-    port: process.env.RDS_PORT || 3306,
-    dialect: "mysql",
+    username: process.env.DB_USERNAME || "root",
+    password: process.env.DB_PASSWORD || null,
+    database: process.env.DB_NAME || "codepush",
+    host: process.env.DB_HOST || "127.0.0.1",
+    port: process.env.DB_PORT || 3306,
+    dialect: process.env.DB_DIALECT || "mysql",
     logging: false,
     operatorsAliases: false,
   },
@@ -39,12 +39,12 @@ config.development = {
   },
   // Config for Aliyun OSS (https://www.aliyun.com/product/oss) when storageType value is "oss".
   oss: {
-    accessKeyId: "",
-    secretAccessKey: "",
-    endpoint: "",
-    bucketName: "",
-    prefix: "", // Key prefix in object key
-    downloadUrl: "", // binary files download host address.
+    accessKeyId: process.env.OSS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.OSS_SECRET_ACCESS_KEY || '',
+    endpoint: process.env.OSS_END_POINT || '',
+    bucketName: process.env.OSS_BUCKET_NAME || '',
+    prefix: process.env.OSS_PREFIX || '', // Key prefix in object key
+    downloadUrl: process.env.OSS_DOWNLOAD || '', // binary files download host address.
   },
   // Config for tencentyun COS (https://cloud.tencent.com/product/cos) when storageType value is "oss".
   tencentcloud: {
@@ -101,8 +101,8 @@ config.development = {
   // Config for redis (register module, tryLoginTimes module)
   redis: {
     default: {
-      host: "127.0.0.1",
-      port: 6379,
+      host: process.env.REDIS_HOST || "127.0.0.1",
+      port: process.env.REDIS_PORT || 6379,
       retry_strategy: function (options) {
         if (options.error.code === 'ECONNREFUSED') {
           // End reconnecting on a specific error and flush all commands with a individual error

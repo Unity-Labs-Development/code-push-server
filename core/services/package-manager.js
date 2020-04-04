@@ -116,15 +116,18 @@ proto.createPackage = function (deploymentId, appVersion, packageHash, manifestH
   .then((labelId) => {
     return models.sequelize.transaction((t) => {
       return self.createDeploymentsVersionIfNotExist(deploymentId, appVersion, params.min_version, params.max_version, t)
-      .then((deploymentsVersions) => {
+      .then(async(deploymentsVersions) => {
+        let deployment = await models.Deployments.findById(deploymentId)
+        let app = await models.Apps.findById(deployment.appid)
+        let prePath = app.name + '/' + appVersion + '/'
         return models.Packages.create({
           deployment_version_id: deploymentsVersions.id,
           deployment_id: deploymentId,
           description: description,
           package_hash: packageHash,
-          blob_url: blobHash,
+          blob_url: prePath + blobHash,
           size: size,
-          manifest_blob_url: manifestHash,
+          manifest_blob_url: prePath + manifestHash,
           release_method: releaseMethod,
           label: "v" + labelId,
           released_by: releaseUid,
@@ -266,14 +269,19 @@ proto.generateOneDiffPackage = function (
       return self.zipDiffPackage(fileName, files, dataCenterContentPath, hotCodePushFile)
       .then((data) => {
         return security.qetag(data.path)
-        .then((diffHash) => {
-          return common.uploadFileToStorage(diffHash, fileName)
+        .then(async (diffHash) => {
+          let packageObj = await models.Packages.findById(packageId)
+          let deployment = await models.Deployments.findById(packageObj.deployment_id)
+          let deploymentVersion = await models.DeploymentsVersions.findById(packageObj.deployment_version_id)
+          let app = await models.Apps.findById(deployment.appid)
+          let prePath = app.name + '/' + deploymentVersion.app_version + '/'
+          return common.uploadFileToStorage(prePath + diffHash, fileName)
           .then(() => {
             var stats = fs.statSync(fileName);
             return models.PackagesDiff.create({
               package_id: packageId,
               diff_against_package_hash: diffPackageHash,
-              diff_blob_url: diffHash,
+              diff_blob_url: prePath + diffHash,
               diff_size: stats.size
             });
           })
@@ -408,10 +416,12 @@ proto.releasePackage = function (appId, deploymentId, packageInfo, filePath, rel
         }
         return security.qetag(manifestFile);
       })
-      .then((manifestHash) => {
+      .then(async (manifestHash) => {
+        let app = await models.Apps.findById(appId)
+        let prePath = app.name + '/' + packageInfo.appVersion + '/'
         return Promise.all([
-          common.uploadFileToStorage(manifestHash, manifestFile),
-          common.uploadFileToStorage(blobHash, filePath)
+          common.uploadFileToStorage(prePath + manifestHash, manifestFile, prePath),
+          common.uploadFileToStorage(prePath + blobHash, filePath)
         ])
         .then(() => [packageHash, manifestHash, blobHash]);
       })

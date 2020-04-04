@@ -29,7 +29,7 @@
     "npm": ">= 3.10.8"
   },
   "scripts": {
-    "dev": "supervisor ./bin/www",
+    "dev": "cross-env NODE_ENV=development ./node_modules/.bin/nodemon ./bin/www",
     "start": "node ./bin/www",
     "init": "node ./bin/db init",
     "upgrade": "node ./bin/db upgrade",
@@ -75,14 +75,17 @@
     "slash": "^2.0.0",
     "validator": "^10.6.0",
     "yargs": "^12.0.1",
-    "yazl": "^2.3.0"
+    "yazl": "^2.3.0",
+    "dotenv-flow": "^3.1.0",
+    "cross-env": "^7.0.2"
   },
   "devDependencies": {
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "should": "^11.2.0",
     "supertest": "^3.0.0",
-    "supervisor": "^0.12.0"
+    "supervisor": "^0.12.0",
+    "nodemon": "^2.0.2"
   },
   "files": [
     "bin",

@@ -300,6 +300,8 @@ common.getBlobDownloadUrl = function (blobUrl) {
   var fileName = blobUrl;
   var storageType = _.get(config, 'common.storageType');
   var downloadUrl = _.get(config, `${storageType}.downloadUrl`);
+  var prefix = _.get(config, `${storageType}.prefix`);
+  if(!prefix) prefix = '';
   if ( storageType === 'local') {
     fileName = blobUrl.substr(0, 2).toLowerCase() + '/' + blobUrl;
   }
@@ -308,7 +310,7 @@ common.getBlobDownloadUrl = function (blobUrl) {
     log.error(e);
     throw e;
   }
-  return `${downloadUrl}/${fileName}`
+  return `${downloadUrl}/${prefix}/${fileName}`
 };
 
 

@@ -119,7 +119,7 @@ proto.createPackage = function (deploymentId, appVersion, packageHash, manifestH
       .then(async(deploymentsVersions) => {
         let deployment = await models.Deployments.findById(deploymentId)
         let app = await models.Apps.findById(deployment.appid)
-        let prePath = app.name + '/' + appVersion + '/'
+        let prePath = `user_${app.uid}/${app.name}/${appVersion}/`
         return models.Packages.create({
           deployment_version_id: deploymentsVersions.id,
           deployment_id: deploymentId,
@@ -274,7 +274,7 @@ proto.generateOneDiffPackage = function (
           let deployment = await models.Deployments.findById(packageObj.deployment_id)
           let deploymentVersion = await models.DeploymentsVersions.findById(packageObj.deployment_version_id)
           let app = await models.Apps.findById(deployment.appid)
-          let prePath = app.name + '/' + deploymentVersion.app_version + '/'
+          let prePath = `user_${app.uid}/${app.name}/${deploymentVersion.app_version}/`
           return common.uploadFileToStorage(prePath + diffHash, fileName)
           .then(() => {
             var stats = fs.statSync(fileName);
@@ -418,7 +418,7 @@ proto.releasePackage = function (appId, deploymentId, packageInfo, filePath, rel
       })
       .then(async (manifestHash) => {
         let app = await models.Apps.findById(appId)
-        let prePath = app.name + '/' + packageInfo.appVersion + '/'
+        let prePath = `user_${app.uid}/${app.name}/${packageInfo.appVersion}/`
         return Promise.all([
           common.uploadFileToStorage(prePath + manifestHash, manifestFile, prePath),
           common.uploadFileToStorage(prePath + blobHash, filePath)

@@ -20,6 +20,7 @@ services:
       OSS_BUCKET_NAME: "REPLACE_YOUR_OSS_BUCKET_NAME"
       OSS_PREFIX: ""
       OSS_DOWNLOAD: "REPLACE_YOUR_OSS_DOWNLOAD"
+      TOKEN_SECRET: "REPLACE_YOUR_RANDOM_SECRET"
     deploy:
       resources:
         limits:
@@ -28,11 +29,7 @@ services:
         condition: on-failure
     ports:
       - "3000:3000"
-    #networks:
-    #  - code-push-net
     network_mode: host
-    volumes:
-      - data-code-push:/data
     depends_on:
       - db
       - redis
@@ -56,11 +53,8 @@ services:
     networks:
       - redisnet
 networks:
-  code-push-net:
   redisnet:
   dbnet:
 volumes:
   data-mysql:
   data-redis:
-  data-code-push:
-    

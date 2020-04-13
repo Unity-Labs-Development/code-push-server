@@ -30,7 +30,8 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development ./node_modules/.bin/nodemon ./bin/www",
-    "start": "node ./bin/www",
+    "start": "cross-env NODE_ENV=production node ./bin/www",
+    "prd": "cross-env NODE_ENV=production pm2-docker start ./bin/www --output ./logs/out.log --error ./logs/error.log",
     "init": "node ./bin/db init",
     "upgrade": "node ./bin/db upgrade",
     "test": "make test",
